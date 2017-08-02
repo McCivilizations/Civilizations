@@ -1,6 +1,6 @@
 package mccivilizations.civilizations;
 
-import mccivilizations.civilizations.proxy.IProxy;
+import mccivilizations.civilizations.common.IProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -17,7 +17,7 @@ public class Civilizations {
     @Mod.Instance
     public static Civilizations INSTANCE;
 
-    @SidedProxy(clientSide = "mccivilizations.civilizations.proxy.ClientProxy", serverSide = "mccivilizations.civilizations.proxy.ServerProxy")
+    @SidedProxy(clientSide = "mccivilizations.civilizations.client.ClientProxy", serverSide = "mccivilizations.civilizations.server.ServerProxy")
     public static IProxy PROXY;
 
     @EventHandler
