@@ -9,15 +9,8 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-ext.configFile = file "build.properties"
-configFile.withReader {
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
-}
-
 version = "1.0.0"
-group = "mccivilizations.civilizations"
+group = "com.mccivilizations"
 archivesBaseName = "civilizations"
 
 sourceCompatibility = targetCompatibility = '1.8'
@@ -26,10 +19,10 @@ compileJava {
 }
 
 minecraft {
-    version = config.minecraft_version + "-" + config.forge_version
+    version = "${minecraft_version}-${forge_version}"
     runDir = "run"
     
-    mappings = config.mappings
+    mappings = "${mapping_version}"
 }
 
 dependencies {
