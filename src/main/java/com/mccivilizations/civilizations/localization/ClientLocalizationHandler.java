@@ -1,12 +1,12 @@
-package mccivilizations.civilizations.client;
+package com.mccivilizations.civilizations.localization;
 
-import mccivilizations.civilizations.api.LocalizationHandler;
+import com.mccivilizations.civilizations.api.localization.ILocalizationHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ClientLocalizationHandler implements LocalizationHandler {
+public class ClientLocalizationHandler implements ILocalizationHandler {
     @Override
     public String format(String s, Object... args) {
         return I18n.format(s, args);
