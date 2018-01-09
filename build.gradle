@@ -8,6 +8,7 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
 
 version = "${minecraft_version}-" + getVersion()
 group = "com.mccivilizations"
