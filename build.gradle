@@ -9,7 +9,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.0"
+version = "${minecraft_version}-" + getVersion()
 group = "com.mccivilizations"
 archivesBaseName = "civilizations"
 
@@ -23,6 +23,10 @@ minecraft {
     runDir = "run"
     
     mappings = "${mapping_version}"
+
+    replace "@VERSION@", project.version
+    replaceIn "Civilizations.java"
+
 }
 
 dependencies {
@@ -42,4 +46,36 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://" + (System.getenv("local_maven") != null ? System.getenv("local_maven") : System.getenv("bamboo_local_maven")))
+        }
+    }
+}
+
+String getVersion() {
+    String version = "${mod_version}"
+    String branch = project.hasProperty("branch") ? project.branch : ""
+
+    if(branch != "") {
+        version += "-" + branch
+
+        String buildNumber = getBuildNumber()
+        if(buildNumber != "") {
+            version += "." + buildNumber
+        }
+    }
+
+    return version
+}
+
+static String getBuildNumber() {
+    String buildNumber = System.getenv("BUILD_NUMBER") != null ? System.getenv("BUILD_NUMBER") : ""
+    if(buildNumber == "") {
+        buildNumber = System.getenv("bamboo_buildNumber") != null ? "." + System.getenv("bamboo_buildNumber") : ""
+    }
+    return buildNumber
 }
