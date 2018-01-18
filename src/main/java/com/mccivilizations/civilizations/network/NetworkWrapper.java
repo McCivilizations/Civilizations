@@ -1,6 +1,8 @@
 package com.mccivilizations.civilizations.network;
 
 import com.mccivilizations.civilizations.Civilizations;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -30,5 +32,9 @@ public class NetworkWrapper {
 
     public void sendToServer(IMessage message) {
         simpleNetworkWrapper.sendToServer(message);
+    }
+
+    public void sendToClient(EntityPlayer entityPlayer, IMessage iMessage) {
+        simpleNetworkWrapper.sendTo(iMessage, (EntityPlayerMP) entityPlayer);
     }
 }

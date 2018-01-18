@@ -27,8 +27,6 @@ public class Civilizations {
     public static IProxy proxy;
     public static Logger logger;
 
-    public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
