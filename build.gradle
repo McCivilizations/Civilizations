@@ -30,8 +30,13 @@ minecraft {
 
 }
 
-dependencies {
+repositories {
+    mavenCentral()
+}
 
+dependencies {
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
+    compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.6'
 }
 
 processResources {
