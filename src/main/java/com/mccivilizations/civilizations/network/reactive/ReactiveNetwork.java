@@ -1,12 +1,12 @@
 package com.mccivilizations.civilizations.network.reactive;
 
-import com.mccivilizations.civilizations.network.NetworkWrapper;
-import com.mccivilizations.civilizations.network.reactive.mapper.IReactiveRequestMapper;
+import com.mccivilizations.civilizations.Civilizations;
 import com.mccivilizations.civilizations.network.reactive.message.ReactiveRequestMessage;
 import com.mccivilizations.civilizations.network.reactive.message.ReactiveRequestMessageHandler;
 import com.mccivilizations.civilizations.network.reactive.message.ReactiveResponseMessage;
 import com.mccivilizations.civilizations.network.reactive.message.ReactiveResponseMessageHandler;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -37,8 +37,8 @@ public class ReactiveNetwork {
     private ReactiveNetwork(ASMDataTable asmDataTable) {
         requestStore = new ReactiveRequestStore(asmDataTable);
 
-        NetworkWrapper.getInstance().registerPacket(ReactiveRequestMessageHandler.class, ReactiveRequestMessage.class,  Side.SERVER);
-        NetworkWrapper.getInstance().registerPacket(ReactiveResponseMessageHandler.class, ReactiveResponseMessage.class,  Side.CLIENT);
+        Civilizations.INSTANCE.getPacketHandler().registerPacket(ReactiveRequestMessageHandler.class, ReactiveRequestMessage.class,  Side.SERVER);
+        Civilizations.INSTANCE.getPacketHandler().registerPacket(ReactiveResponseMessageHandler.class, ReactiveResponseMessage.class,  Side.CLIENT);
 
     }
 
@@ -46,7 +46,7 @@ public class ReactiveNetwork {
         long requestId = nextId++;
         requestStore.addNewRequest(requestId, onReceive);
 
-        NetworkWrapper.getInstance().sendToServer(new ReactiveRequestMessage(requestId,
+        Civilizations.INSTANCE.getPacketHandler().sendToServer(new ReactiveRequestMessage(requestId,
                 new ReactiveRequest(type, method, parameters)));
     }
 
@@ -57,8 +57,8 @@ public class ReactiveNetwork {
     @SuppressWarnings("unchecked")
     public void respondToClient(WeakReference<EntityPlayer> entityPlayerWeakReference, Long id, String type, Object object) {
         EntityPlayer entityPlayer = entityPlayerWeakReference.get();
-        if (Objects.nonNull(entityPlayer)) {
-            NetworkWrapper.getInstance().sendToClient(entityPlayer, new ReactiveResponseMessage(id, object, type));
+        if (entityPlayer instanceof EntityPlayerMP) {
+            Civilizations.INSTANCE.getPacketHandler().sendToPlayer(new ReactiveResponseMessage(id, object, type), (EntityPlayerMP) entityPlayer);
         }
     }
 }

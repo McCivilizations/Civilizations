@@ -1,7 +1,6 @@
 package com.mccivilizations.civilizations.network.reactive;
 
 import com.google.common.collect.Maps;
-import com.mccivilizations.civilizations.network.NetworkWrapper;
 import com.mccivilizations.civilizations.network.reactive.mapper.IReactiveRequestMapper;
 import com.mccivilizations.civilizations.network.reactive.mapper.ReactiveRequestMapper;
 import com.mccivilizations.civilizations.network.reactive.message.ReactiveRequestMessage;
@@ -9,13 +8,11 @@ import com.mccivilizations.civilizations.network.reactive.message.ReactiveRespon
 import com.mccivilizations.civilizations.network.reactive.requesthandler.IReactiveRequestHandler;
 import com.mccivilizations.civilizations.network.reactive.requesthandler.ReactiveRequestHandler;
 import com.mccivilizations.civilizations.utils.ClassLoading;
-import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
