@@ -32,11 +32,16 @@ minecraft {
 
 repositories {
     mavenCentral()
+    maven {
+        name 'BASE'
+        url 'http://maven.teamacronymcoders.com'
+    }
 }
 
 dependencies {
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
     compile group: 'commons-dbutils', name: 'commons-dbutils', version: '1.6'
+    compile group: 'com.teamacronymcoders.base', name: 'base', version: '1.12.2-${base_version}-SNAPSHOT.+'
 }
 
 processResources {
