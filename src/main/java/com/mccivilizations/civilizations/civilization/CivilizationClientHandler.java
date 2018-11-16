@@ -1,6 +1,7 @@
 package com.mccivilizations.civilizations.civilization;
 
 import com.google.common.collect.Maps;
+import com.mccivilizations.civilizations.Civilizations;
 import com.mccivilizations.civilizations.api.civilization.Civilization;
 import com.mccivilizations.civilizations.api.civilization.ICivilizationHandler;
 import com.mccivilizations.civilizations.network.reactive.ReactiveNetwork;
@@ -27,6 +28,7 @@ public class CivilizationClientHandler implements ICivilizationHandler {
     public void getCivilizationByPlayerUUID(UUID uuid, Consumer<Civilization> onReceived) {
         Map<String, String> parameters = Maps.newHashMap();
         parameters.put("LEADER_UUID", uuid.toString());
-        ReactiveNetwork.getInstance().requestFromServer(Civilization.NAME, "BY_LEADER_UUID", parameters, onReceived);
+        Civilizations.INSTANCE.getCivilizationNetwork()
+                .sendRequest(Civilization.NAME, parameters, onReceived);
     }
 }

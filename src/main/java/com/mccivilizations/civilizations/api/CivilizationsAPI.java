@@ -1,6 +1,8 @@
 package com.mccivilizations.civilizations.api;
 
+import com.mccivilizations.civilizations.api.civilization.Civilization;
 import com.mccivilizations.civilizations.api.civilization.ICivilizationHandler;
+import com.mccivilizations.civilizations.api.date.MinecraftDate;
 import com.mccivilizations.civilizations.api.localization.ILocalizationHandler;
 
 import java.util.Objects;
@@ -10,6 +12,10 @@ public class CivilizationsAPI {
 
     private final ICivilizationHandler civilizationHandler;
     private final ILocalizationHandler localizationHandler;
+
+    public static final Civilization THE_FORGOTTEN = createTheForgotten();
+
+
 
     public static CivilizationsAPI getInstance() {
         return Objects.requireNonNull(instance, "Called Civilizations API before it was setup");
@@ -34,5 +40,13 @@ public class CivilizationsAPI {
 
     public ILocalizationHandler getLocalizationHandler() {
         return localizationHandler;
+    }
+
+    private static Civilization createTheForgotten() {
+        Civilization forgotten = new Civilization();
+        forgotten.setCreationDate(new MinecraftDate(0));
+        forgotten.setDestructionDate(new MinecraftDate(0));
+        forgotten.setMotto("Forgotten, but not Gone");
+        forgotten.setLeader();
     }
 }

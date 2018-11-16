@@ -1,64 +1,72 @@
 package com.mccivilizations.civilizations.network.reactive;
 
-import com.mccivilizations.civilizations.Civilizations;
-import com.mccivilizations.civilizations.network.reactive.message.ReactiveRequestMessage;
-import com.mccivilizations.civilizations.network.reactive.message.ReactiveRequestMessageHandler;
-import com.mccivilizations.civilizations.network.reactive.message.ReactiveResponseMessage;
-import com.mccivilizations.civilizations.network.reactive.message.ReactiveResponseMessageHandler;
-import net.minecraft.entity.player.EntityPlayer;
+import com.mccivilizations.civilizations.network.reactive.request.CreateReactiveRequestFunction;
+import com.mccivilizations.civilizations.network.reactive.request.ReactiveRequestMessage;
+import com.mccivilizations.civilizations.network.reactive.request.ReactiveRequestMessageHandler;
+import com.mccivilizations.civilizations.network.reactive.response.CreateReactiveResponseFunction;
+import com.mccivilizations.civilizations.network.reactive.response.ReactiveResponseHandler;
+import com.mccivilizations.civilizations.network.reactive.response.ReactiveResponseMessage;
+import com.teamacronymcoders.base.IBaseMod;
+import com.teamacronymcoders.base.network.PacketHandler;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
-public class ReactiveNetwork {
-    private static ReactiveNetwork instance;
+public class ReactiveNetwork<ParamT, ObjectT, RequestT extends ReactiveRequestMessage<ParamT>,
+        ResponseT extends ReactiveResponseMessage<ObjectT>> {
 
-    private final ReactiveRequestStore requestStore;
-    private long nextId = 1;
+    private CreateReactiveRequestFunction<ParamT> createRequestPacket;
+    private CreateReactiveResponseFunction<ObjectT> createResponsePacket;
+    private final IRequestHandler<ParamT, ObjectT> requestHandler;
+    private final PacketHandler packetHandler;
 
-    public static ReactiveNetwork getInstance() {
-        return Objects.requireNonNull(instance, "Called ReactiveNetwork before it was Setup");
+    private int lastRequestId;
+
+    private final TIntObjectMap<WeakReference<EntityPlayerMP>> responsePlayers;
+    private final TIntObjectMap<Consumer<ObjectT>> responseHandlers;
+
+    public ReactiveNetwork(IBaseMod mod, Class<RequestT> requestTClass, CreateReactiveRequestFunction<ParamT> createRequestPacket,
+                           Class<ResponseT> responseTClass, CreateReactiveResponseFunction<ObjectT> createResponsePacket,
+                           IRequestHandler<ParamT, ObjectT> requestHandler) {
+        this.createRequestPacket = createRequestPacket;
+        this.createResponsePacket = createResponsePacket;
+        this.requestHandler = requestHandler;
+        this.packetHandler = mod.getPacketHandler();
+        this.responseHandlers = new TIntObjectHashMap<>();
+        this.responsePlayers = new TIntObjectHashMap<>();
+        this.packetHandler.registerPacket(new ReactiveRequestMessageHandler<>(this), requestTClass, Side.SERVER);
+        this.packetHandler.registerPacket(new ReactiveResponseHandler<>(this), responseTClass, Side.CLIENT);
     }
 
-    public static void setup(ASMDataTable asmDataTable) {
-        ReactiveNetwork reactiveNetwork = new ReactiveNetwork(asmDataTable);
-        if (instance != null) {
-            throw new IllegalStateException("Reactive Network was already setup!");
-        } else {
-            instance = reactiveNetwork;
+    public void sendRequest(String method, ParamT params, Consumer<ObjectT> objectTConsumer) {
+        final int requestId = ++lastRequestId;
+        this.packetHandler.sendToServer(createRequestPacket.apply(requestId, method, params));
+        this.responseHandlers.put(requestId, objectTConsumer);
+    }
+
+    public void handleRequest(int requestId, String method, ParamT parameters) {
+        requestHandler.handleRequest(method, parameters, objectT -> sendResponse(requestId, objectT));
+    }
+
+    private void sendResponse(int requestId, ObjectT object) {
+        WeakReference<EntityPlayerMP> responsePlayerRef = responsePlayers.remove(requestId);
+        if (responsePlayerRef != null) {
+            responsePlayers.remove(requestId);
+            EntityPlayerMP entityPlayerMP = responsePlayerRef.get();
+            if (entityPlayerMP != null) {
+                this.packetHandler.sendToPlayer(createResponsePacket.apply(requestId, object), entityPlayerMP);
+            }
         }
     }
 
-    private ReactiveNetwork(ASMDataTable asmDataTable) {
-        requestStore = new ReactiveRequestStore(asmDataTable);
-
-        Civilizations.INSTANCE.getPacketHandler().registerPacket(ReactiveRequestMessageHandler.class, ReactiveRequestMessage.class,  Side.SERVER);
-        Civilizations.INSTANCE.getPacketHandler().registerPacket(ReactiveResponseMessageHandler.class, ReactiveResponseMessage.class,  Side.CLIENT);
-
-    }
-
-    public <T> void requestFromServer(String type, String method, Map<String, String> parameters, Consumer<T> onReceive) {
-        long requestId = nextId++;
-        requestStore.addNewRequest(requestId, onReceive);
-
-        Civilizations.INSTANCE.getPacketHandler().sendToServer(new ReactiveRequestMessage(requestId,
-                new ReactiveRequest(type, method, parameters)));
-    }
-
-    public ReactiveRequestStore getRequestStore() {
-        return requestStore;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void respondToClient(WeakReference<EntityPlayer> entityPlayerWeakReference, Long id, String type, Object object) {
-        EntityPlayer entityPlayer = entityPlayerWeakReference.get();
-        if (entityPlayer instanceof EntityPlayerMP) {
-            Civilizations.INSTANCE.getPacketHandler().sendToPlayer(new ReactiveResponseMessage(id, object, type), (EntityPlayerMP) entityPlayer);
+    public void handleResponse(int requestId, ObjectT object) {
+        Consumer<ObjectT> responseHandler = responseHandlers.remove(requestId);
+        if (responseHandler != null) {
+            responseHandler.accept(object);
         }
     }
 }

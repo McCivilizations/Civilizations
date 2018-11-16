@@ -1,13 +1,10 @@
 package com.mccivilizations.database;
 
-import com.mccivilizations.civilizations.Civilizations;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.management.Query;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -38,27 +35,20 @@ public class Database {
     }
 
     public <T> Optional<T> query(String query, ResultSetHandler<T> handler, Object... parameters) {
-        Optional<T> returned = Optional.empty();
-
         try {
-            returned = Optional.ofNullable(new QueryRunner().query(connection, query, handler, parameters));
+            return Optional.ofNullable(new QueryRunner().query(connection, query, handler, parameters));
         } catch (SQLException e) {
             logger.error(e);
+            return Optional.empty();
         }
-
-        return returned;
     }
 
     public <T> Optional<T> insert(String insert, ResultSetHandler<T> handler, Object... parameters) {
-        Optional<T> returned = Optional.empty();
-
         try {
-            returned = Optional.ofNullable(new QueryRunner().insert(connection, insert, handler, parameters));
+            return Optional.ofNullable(new QueryRunner().insert(connection, insert, handler, parameters));
         } catch (SQLException e) {
             logger.error(e);
+            return Optional.empty();
         }
-
-        return returned;
     }
-
 }

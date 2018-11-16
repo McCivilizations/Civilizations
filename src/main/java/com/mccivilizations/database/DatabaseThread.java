@@ -11,6 +11,7 @@ public class DatabaseThread {
 
     public <T> void doDatabaseCall(Callable<T> task) {
         ListenableFuture<T> listenableFuture = executorService.submit(task);
-        ;
     }
+
+
 }

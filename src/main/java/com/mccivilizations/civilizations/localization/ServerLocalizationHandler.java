@@ -13,6 +13,7 @@ public class ServerLocalizationHandler implements ILocalizationHandler {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean exists(String s) {
         return I18n.canTranslate(s);
     }
