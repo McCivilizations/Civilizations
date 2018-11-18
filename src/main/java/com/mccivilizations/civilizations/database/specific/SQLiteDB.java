@@ -16,7 +16,7 @@ public class SQLiteDB implements IDBSpecific {
     public DataSource createDataSource(String connectionInfo) {
         SQLiteConnectionPoolDataSource dataSource = new SQLiteConnectionPoolDataSource();
         connectionInfo = connectionInfo.replace("${minecraft}",
-                Civilizations.INSTANCE.getMinecraftFolder().getAbsolutePath());
+                Civilizations.instance.getMinecraftFolder().getAbsolutePath());
         dataSource.setUrl("jdbc:sqlite:" + connectionInfo);
         return dataSource;
     }
