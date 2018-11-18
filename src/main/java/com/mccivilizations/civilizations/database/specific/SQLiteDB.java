@@ -8,12 +8,8 @@ import javax.sql.DataSource;
 @DBSpecific("SQLite")
 public class SQLiteDB implements IDBSpecific {
     @Override
-    public void initializeDriver() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            Civilizations.INSTANCE.getLogger().error(e);
-        }
+    public void initializeDriver() throws ClassNotFoundException {
+        Class.forName("org.sqlite.JDBC");
     }
 
     @Override
@@ -23,5 +19,10 @@ public class SQLiteDB implements IDBSpecific {
                 Civilizations.INSTANCE.getMinecraftFolder().getAbsolutePath());
         dataSource.setUrl("jdbc:sqlite:" + connectionInfo);
         return dataSource;
+    }
+
+    @Override
+    public String getPathToMigrations() {
+        return "classpath:assets/civilizations/database/migrations/sqlite";
     }
 }
