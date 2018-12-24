@@ -6,17 +6,17 @@ import com.mccivilizations.civilizations.functional.ThrowingConsumer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class CreateOperation implements ISQLOperation {
+public class UpdateOperation implements ISQLOperation {
     private final String sql;
     private final ThrowingConsumer<PreparedStatement, SQLException> statementConsumer;
 
-    public CreateOperation(String sql, ThrowingConsumer<PreparedStatement, SQLException> statementConsumer) {
+    public UpdateOperation(String sql, ThrowingConsumer<PreparedStatement, SQLException> statementConsumer) {
         this.sql = sql;
         this.statementConsumer = statementConsumer;
     }
 
     @Override
     public void handle(Database database) {
-        database.create(sql, statementConsumer);
+        database.update(sql, statementConsumer);
     }
 }

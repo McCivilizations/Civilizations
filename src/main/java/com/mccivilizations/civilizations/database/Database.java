@@ -32,10 +32,6 @@ public class Database {
         flyway.migrate();
     }
 
-    public void create(String createStatement, ThrowingConsumer<PreparedStatement, SQLException> statementSetter) {
-        update(createStatement, statementSetter);
-    }
-
     public void update(String updateStatement, ThrowingConsumer<PreparedStatement, SQLException> statementSetter) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(updateStatement)) {
