@@ -1,9 +1,9 @@
 package com.mccivilizations.civilizations.proxy;
 
-import com.mccivilizations.civilizations.database.IDatabase;
+import net.minecraft.server.MinecraftServer;
+
+import java.io.File;
 
 public interface IProxy {
-    void setupDatabase();
-
-    IDatabase getDatabase();
+    File getSaveFolder(MinecraftServer minecraftServer);
 }

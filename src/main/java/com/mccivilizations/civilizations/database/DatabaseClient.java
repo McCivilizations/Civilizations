@@ -1,17 +1,18 @@
 package com.mccivilizations.civilizations.database;
 
 import com.mccivilizations.civilizations.Civilizations;
+import com.mccivilizations.civilizations.api.database.IDatabaseClient;
 import com.mccivilizations.civilizations.database.operation.ISQLOperation;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ServerDatabase extends Thread implements IDatabase {
+public class DatabaseClient extends Thread implements AutoCloseable, IDatabaseClient {
     private final ExecutorService service;
     private final Database database;
 
-    public ServerDatabase(final Database database) {
+    public DatabaseClient(final Database database) {
         this.database = database;
         this.service = Executors.newSingleThreadExecutor();
     }
@@ -27,6 +28,4 @@ public class ServerDatabase extends Thread implements IDatabase {
         service.awaitTermination(1, TimeUnit.MINUTES);
         Civilizations.instance.getLogger().warning("Finished Closing Database");
     }
-
-
 }

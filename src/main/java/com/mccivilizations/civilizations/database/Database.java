@@ -1,9 +1,11 @@
 package com.mccivilizations.civilizations.database;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mccivilizations.civilizations.database.specific.DBSpecific;
 import com.mccivilizations.civilizations.database.specific.IDBSpecific;
 import com.mccivilizations.civilizations.functional.ThrowingConsumer;
+import com.mccivilizations.civilizations.functional.ThrowingFunction;
 import com.teamacronymcoders.base.util.ClassLoading;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +15,9 @@ import org.flywaydb.core.api.Location;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public class Database {
@@ -40,6 +44,24 @@ public class Database {
         } catch (SQLException e) {
             logger.error("Failed to Update with Statement: " + updateStatement, e);
         }
+    }
+
+    public <T> List<T> query(String query, ThrowingConsumer<PreparedStatement, SQLException> statementSetter,
+                             ThrowingFunction<ResultSet, T, SQLException> objectParser) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statementSetter.accept(statement);
+            ResultSet resultSet = statement.executeQuery();
+            List<T> resultList = Lists.newArrayList();
+            while (resultSet.next()) {
+                resultList.add(objectParser.apply(resultSet));
+            }
+            return resultList;
+        } catch (SQLException e) {
+            logger.error("Failed to Query with Statement: " + query, e);
+        }
+
+        return Lists.newArrayList();
     }
 
     public static Database create(String databaseName, String connectionUrl, Logger logger) {

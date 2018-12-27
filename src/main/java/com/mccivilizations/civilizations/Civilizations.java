@@ -1,17 +1,20 @@
 package com.mccivilizations.civilizations;
 
-import com.mccivilizations.civilizations.api.civilization.Civilization;
+import com.mccivilizations.civilizations.api.CivilizationsAPI;
+import com.mccivilizations.civilizations.api.database.IDatabaseClient;
+import com.mccivilizations.civilizations.database.DBConfig;
 import com.mccivilizations.civilizations.database.Database;
+import com.mccivilizations.civilizations.database.DatabaseClient;
 import com.mccivilizations.civilizations.proxy.IProxy;
 import com.teamacronymcoders.base.BaseModFoundation;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.event.*;
+
+import java.io.File;
 
 @Mod(modid = Civilizations.MODID, name = Civilizations.NAME, version = Civilizations.VERSION)
 public class Civilizations extends BaseModFoundation<Civilizations> {
@@ -21,6 +24,7 @@ public class Civilizations extends BaseModFoundation<Civilizations> {
 
     @Instance
     public static Civilizations instance;
+
     @SidedProxy(clientSide = "com.mccivilizations.civilizations.proxy.ClientProxy",
             serverSide = "com.mccivilizations.civilizations.proxy.ServerProxy")
     public static IProxy proxy;
@@ -35,11 +39,6 @@ public class Civilizations extends BaseModFoundation<Civilizations> {
         super.preInit(event);
     }
 
-    @Override
-    public void beforeModuleHandlerInit(FMLPreInitializationEvent event) {
-        proxy.setupDatabase();
-    }
-
     @EventHandler
     public void init(FMLInitializationEvent event) {
         super.init(event);
@@ -51,12 +50,27 @@ public class Civilizations extends BaseModFoundation<Civilizations> {
     }
 
     @EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        IDatabaseClient databaseClient = new DatabaseClient(Database.create(DBConfig.databaseType,
+                handleConnectionReplace(proxy.getSaveFolder(event.getServer()), DBConfig.connectionInfo),
+                this.getLogger().getLogger()));
+        CivilizationsAPI.getInstance().setDatabaseClient(databaseClient);
+    }
+
+    private String handleConnectionReplace(File mcWorldDirect, String connectionInfo) {
+        connectionInfo = connectionInfo.replace("${minecraft}",
+                mcWorldDirect.getAbsolutePath());
+        return connectionInfo;
+    }
+
+    @EventHandler
     public void serverStopped(FMLServerStoppingEvent event) {
         try {
-            proxy.getDatabase().close();
+            CivilizationsAPI.getInstance().getDatabaseClient().close();
         } catch (Exception e) {
             this.getLogger().getLogger().error("Failed to Close Database", e);
         }
+        CivilizationsAPI.getInstance().setDatabaseClient(null);
     }
 
     @Override
