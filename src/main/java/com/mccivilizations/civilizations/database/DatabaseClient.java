@@ -3,6 +3,9 @@ package com.mccivilizations.civilizations.database;
 import com.mccivilizations.civilizations.Civilizations;
 import com.mccivilizations.civilizations.api.database.IDatabaseClient;
 import com.mccivilizations.civilizations.database.operation.ISQLOperation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -29,11 +29,11 @@ public class Database {
     private Database(DataSource dataSource, String migrationLocation, Logger logger) {
         this.dataSource = dataSource;
         this.logger = logger;
-        Flyway flyway = Flyway.configure()
+        Flyway.configure()
                 .dataSource(dataSource)
                 .locations(new Location(migrationLocation))
-                .load();
-        flyway.migrate();
+                .load()
+                .migrate();
     }
 
     public void update(String updateStatement, ThrowingConsumer<PreparedStatement, SQLException> statementSetter) {

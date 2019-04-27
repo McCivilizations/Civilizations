@@ -2,7 +2,8 @@ CREATE TABLE civilization
 (
   id       INTEGER PRIMARY KEY AUTOINCREMENT,
   name     TEXT       NOT NULL UNIQUE,
-  iso_code VARCHAR(3) NOT NULL UNIQUE
+  iso_code VARCHAR(3) NOT NULL UNIQUE,
+  team_name VARCHAR NOT NULL UNIQUE
 );
 
 CREATE TABLE position
@@ -24,9 +25,9 @@ CREATE TABLE player_position
   per_id INTEGER NOT NULL UNIQUE,
   civ_id INTEGER NOT NULL,
   pos_id INTEGER NOT NULL,
-  FOREIGN KEY (per_id) REFERENCES PERSON (id),
-  FOREIGN KEY (civ_id) REFERENCES CIVILIZATION (id),
-  FOREIGN KEY (pos_id) REFERENCES POSITION (id)
+  FOREIGN KEY (per_id) REFERENCES player (id),
+  FOREIGN KEY (civ_id) REFERENCES civilization (id),
+  FOREIGN KEY (pos_id) REFERENCES position (id)
 )
 
 

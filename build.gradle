@@ -5,10 +5,12 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath "io.ebean:ebean-gradle-plugin:11.36.1"
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
+apply plugin: 'io.ebean'
 
 version = "${minecraft_version}-" + getVersion()
 group = "com.mccivilizations"
@@ -39,10 +41,10 @@ repositories {
 }
 
 dependencies {
-    compile "org.xerial:sqlite-jdbc:3.25.2"
-    compile "commons-dbutils:commons-dbutils:1.6"
-    compile "org.flywaydb:flyway-core:5.2.1"
-    compile "com.teamacronymcoders.base:base:1.12.2-${base_version}-SNAPSHOT.+"
+    compile "io.ebean:ebean:11.37.1"
+    compile 'io.ebean:ebean-querybean:11.37.1'
+    compile "com.h2database:h2:1.4.191"
+    deobfCompile "com.teamacronymcoders.base:base:1.12.2-${base_version}-SNAPSHOT.+"
 }
 
 processResources {
@@ -66,6 +68,22 @@ uploadArchives {
             repository(url: "file://" + (System.getenv("local_maven") != null ? System.getenv("local_maven") : System.getenv("bamboo_local_maven")))
         }
     }
+}
+
+ebean {
+    debugLevel = 1
+    queryBeans = true
+}
+
+idea {
+    module {
+        sourceDirs += file("$projectDir/generated")
+        generatedSourceDirs += file("$projectDir/generated")
+    }
+}
+
+configurations {
+    apt
 }
 
 String getVersion() {

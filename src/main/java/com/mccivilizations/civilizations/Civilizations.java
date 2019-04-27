@@ -2,11 +2,14 @@ package com.mccivilizations.civilizations;
 
 import com.mccivilizations.civilizations.api.CivilizationsAPI;
 import com.mccivilizations.civilizations.api.database.IDatabaseClient;
+import com.mccivilizations.civilizations.block.BlockCivilizationMarker;
 import com.mccivilizations.civilizations.database.DBConfig;
 import com.mccivilizations.civilizations.database.Database;
 import com.mccivilizations.civilizations.database.DatabaseClient;
 import com.mccivilizations.civilizations.proxy.IProxy;
+import com.mccivilizations.civilizations.repository.RepositoryHolder;
 import com.teamacronymcoders.base.BaseModFoundation;
+import com.teamacronymcoders.base.registrysystem.BlockRegistry;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -37,6 +40,7 @@ public class Civilizations extends BaseModFoundation<Civilizations> {
     public void preInit(FMLPreInitializationEvent event) {
         Database.initializeImplementations(event.getAsmData());
         super.preInit(event);
+        CivilizationsAPI.getInstance().setRepositoryHolder(new RepositoryHolder());
     }
 
     @EventHandler
@@ -71,6 +75,11 @@ public class Civilizations extends BaseModFoundation<Civilizations> {
             this.getLogger().getLogger().error("Failed to Close Database", e);
         }
         CivilizationsAPI.getInstance().setDatabaseClient(null);
+    }
+
+    @Override
+    public void registerBlocks(BlockRegistry registry) {
+        registry.register(new BlockCivilizationMarker());
     }
 
     @Override
