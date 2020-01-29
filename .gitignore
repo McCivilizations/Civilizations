@@ -21,3 +21,9 @@ build
 # other
 eclipse
 run
+
+civilizations\.db
+
+\.ideaDataSources/
+
+dataSources/
