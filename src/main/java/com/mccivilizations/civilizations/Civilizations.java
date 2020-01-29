@@ -1,19 +1,16 @@
 package com.mccivilizations.civilizations;
 
-import com.mccivilizations.civilizations.api.CivilizationsAPI;
 import com.mccivilizations.civilizations.content.CivBlocks;
-import com.mccivilizations.civilizations.database.DBConfig;
-import com.mccivilizations.civilizations.database.Database;
-import com.mccivilizations.civilizations.database.DatabaseClient;
+import com.mccivilizations.database.Database;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.File;
 
 @Mod(Civilizations.MODID)
 public class Civilizations {
@@ -28,28 +25,15 @@ public class Civilizations {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         CivBlocks.register(modEventBus);
 
+        Database.setup();
 
+        MinecraftForge.EVENT_BUS.addListener(this::onPlayerLogin);
     }
 
-    public void serverStarting(FMLServerStartingEvent event) {
-        IDatabaseClient databaseClient = new DatabaseClient(Database.create(DBConfig.databaseType,
-                handleConnectionReplace(event.getServer().getDataDirectory(), DBConfig.connectionInfo),
-                LOGGER));
-        CivilizationsAPI.getInstance().setDatabaseClient(databaseClient);
-    }
-
-    private String handleConnectionReplace(File mcWorldDirect, String connectionInfo) {
-        connectionInfo = connectionInfo.replace("${minecraft}",
-                mcWorldDirect.getAbsolutePath());
-        return connectionInfo;
-    }
-
-    public void serverStopped(FMLServerStoppingEvent event) {
-        try {
-            CivilizationsAPI.getInstance().getDatabaseClient().close();
-        } catch (Exception e) {
-            LOGGER.error("Failed to Close Database", e);
-        }
-        CivilizationsAPI.getInstance().setDatabaseClient(null);
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> Database.getInstance().insert(
+                "insert into player(name, uuid) values(?, ?)", event.getPlayer().getName().getFormattedText(),
+                event.getPlayer().getUniqueID().toString()
+        ));
     }
 }

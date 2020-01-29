@@ -1,4 +1,4 @@
-package com.mccivilizations.civilizations.database;
+package com.mccivilizations.database;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

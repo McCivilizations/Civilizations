@@ -3,7 +3,7 @@ loaderVersion="[26,)"
 issueTrackerURL="https://github.com/McCivilizations/Civilizations/issues"
 
 [[mods]]
-    modId="mccivilizations"
+    modId="civilizations"
     version="${file.jarVersion}"
     displayName="McCivilizations"
     authors="SkySom"

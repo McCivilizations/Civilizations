@@ -1,11 +1,13 @@
-package com.mccivilizations.civilizations.database.specific;
+package com.mccivilizations.database.support;
 
 import javax.sql.DataSource;
 
-public interface IDBSpecific {
+public interface IDBSupport {
     void initializeDriver() throws ClassNotFoundException;
 
     DataSource createDataSource(String connectionInfo);
 
     String getPathToMigrations();
+
+    String getName();
 }
