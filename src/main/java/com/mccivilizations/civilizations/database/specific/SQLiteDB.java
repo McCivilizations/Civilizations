@@ -20,6 +20,6 @@ public class SQLiteDB implements IDBSpecific {
 
     @Override
     public String getPathToMigrations() {
-        return "classpath:assets/civilizations/database/migrations/sqlite";
+        return "classpath:migrations/civilizations/sqlite";
     }
 }

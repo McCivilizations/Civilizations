@@ -1,7 +1,7 @@
 package com.mccivilizations.civilizations.api.civilization;
 
 public class Civilization {
-    private final long id;
+    private long id;
     private String name;
 
     public Civilization(long id, String name) {

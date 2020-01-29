@@ -1,17 +1,24 @@
 package com.mccivilizations.civilizations.database;
 
-import com.mccivilizations.civilizations.Civilizations;
-import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.Config.Comment;
-import net.minecraftforge.common.config.Config.RequiresMcRestart;
+import net.minecraftforge.common.ForgeConfigSpec;
 
-@Config(modid = Civilizations.MODID, name = Civilizations.MODID, category = "database")
 public class DBConfig {
-    @RequiresMcRestart
-    @Comment("Database Type (SQLite)")
-    public static String databaseType = "SQLite";
+    public static DBConfig instance;
 
-    @RequiresMcRestart
-    @Comment("Connection Info for the JDBC Driver. Note that this is only the connection info")
-    public static String connectionInfo = "${minecraft}/civilizations.db";
+    public final ForgeConfigSpec.ConfigValue<String> databaseType;
+    public final ForgeConfigSpec.ConfigValue<String> connectionInfo;
+
+    public final ForgeConfigSpec spec;
+
+    public DBConfig(ForgeConfigSpec.Builder builder) {
+        databaseType = builder.define("Database Type", "SQLite");
+        connectionInfo = builder.define("Connection Info", "${minecraft}/civilizations.db");
+        this.spec = builder.build();
+    }
+
+    public static ForgeConfigSpec initialize() {
+        DBConfig config = new DBConfig(new ForgeConfigSpec.Builder());
+        instance = config;
+        return config.spec;
+    }
 }
