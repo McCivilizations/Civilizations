@@ -1,65 +1,96 @@
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-        classpath "io.ebean:ebean-gradle-plugin:11.36.1"
+        classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven'
-apply plugin: 'io.ebean'
+
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: "maven"
+apply plugin: "java"
+apply plugin: "idea"
 
 version = "${minecraft_version}-" + getVersion()
-group = "com.mccivilizations"
-archivesBaseName = "civilizations"
+group = "${group}"
+archivesBaseName = "${mod_name}"
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        name = "forge"
+        url = "http://files.minecraftforge.net/maven"
+    }
+    maven {
+        name = "The Loader"
+        url = "https://maven.blamejared.com"
+    }
+    maven {
+        name = "Titanium"
+        url = "https://cdn.hrzn.studio/maven/"
+    }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    runDir = "run"
-    
-    mappings = "${mapping_version}"
+    mappings channel: "snapshot", version: "${mappings_version}"
 
-    replace "@VERSION@", project.version
-    replaceIn "Civilizations.java"
+    runs {
+        client {
+            workingDirectory project.file("run")
+            source sourceSets.main
+        }
 
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        name 'BASE'
-        url 'http://maven.teamacronymcoders.com'
+        server {
+            workingDirectory project.file("run")
+            source sourceSets.main
+        }
     }
 }
 
 dependencies {
-    compile "io.ebean:ebean:11.37.1"
-    compile 'io.ebean:ebean-querybean:11.37.1'
-    compile "com.h2database:h2:1.4.191"
-    deobfCompile "com.teamacronymcoders.base:base:1.12.2-${base_version}-SNAPSHOT.+"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compile fg.deobf('com.teamacronymcoders:theloader:1.14.4-1.0.0-SNAPSHOT.3')
+    compile fg.deobf('com.hrznstudio:titanium:1.14.4-2.2.12')
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+task srcJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = "sources"
+}
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = "javadoc"
+    from javadoc.destinationDir
+}
 
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "${title}",
+                "Specification-Vendor"    : "${team}",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "${team}",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
+}
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+artifacts {
+    archives javadocJar
+    archives srcJar
 }
 
 uploadArchives {
@@ -70,31 +101,18 @@ uploadArchives {
     }
 }
 
-ebean {
-    debugLevel = 1
-    queryBeans = true
-}
-
-idea {
-    module {
-        sourceDirs += file("$projectDir/generated")
-        generatedSourceDirs += file("$projectDir/generated")
-    }
-}
-
-configurations {
-    apt
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 String getVersion() {
     String version = "${mod_version}"
     String branch = project.hasProperty("branch") ? project.branch : ""
 
-    if(branch != "") {
+    if (branch != "") {
         version += "-" + branch
 
         String buildNumber = getBuildNumber()
-        if(buildNumber != "") {
+        if (buildNumber != "") {
             version += "." + buildNumber
         }
     }
@@ -104,8 +122,14 @@ String getVersion() {
 
 static String getBuildNumber() {
     String buildNumber = System.getenv("BUILD_NUMBER") != null ? System.getenv("BUILD_NUMBER") : ""
-    if(buildNumber == "") {
-        buildNumber = System.getenv("bamboo_buildNumber") != null ? "." + System.getenv("bamboo_buildNumber") : ""
+    if (buildNumber == "") {
+        buildNumber = System.getenv("bamboo_buildNumber") != null ? System.getenv("bamboo_buildNumber") : ""
     }
     return buildNumber
+}
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xmaxerrs" << "10000"
+    }
 }

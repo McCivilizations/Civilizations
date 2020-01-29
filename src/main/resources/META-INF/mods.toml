@@ -1,0 +1,12 @@
+modLoader="javafml"
+loaderVersion="[26,)"
+issueTrackerURL="https://github.com/McCivilizations/Civilizations/issues"
+
+[[mods]]
+    modId="mccivilizations"
+    version="${file.jarVersion}"
+    displayName="McCivilizations"
+    authors="SkySom"
+    description='''
+        
+    '''
