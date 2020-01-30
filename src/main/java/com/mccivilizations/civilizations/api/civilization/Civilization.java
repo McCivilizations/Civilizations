@@ -1,23 +1,33 @@
 package com.mccivilizations.civilizations.api.civilization;
 
-public class Civilization {
-    private long id;
-    private String name;
+import net.minecraft.nbt.CompoundNBT;
 
-    public Civilization(long id, String name) {
+public class Civilization {
+    private final long id;
+    private final String name;
+    private final String isoCode;
+    private final CompoundNBT flagPattern;
+
+    public Civilization(long id, String name, String isoCode, CompoundNBT flagPattern) {
         this.id = id;
         this.name = name;
+        this.isoCode = isoCode;
+        this.flagPattern = flagPattern;
     }
 
     public long getId() {
-        return id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return this.id;
     }
 
     public String getName() {
-        return name;
+        return this.name;
+    }
+
+    public String getIsoCode() {
+        return this.isoCode;
+    }
+
+    public CompoundNBT getFlagPattern() {
+        return this.flagPattern;
     }
 }

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.Flyway;
@@ -19,6 +20,9 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class Database implements AutoCloseable {
     private static final Logger LOGGER = LogManager.getLogger(Database.class);
@@ -35,12 +39,24 @@ public class Database implements AutoCloseable {
         this.queryRunner = new QueryRunner(dataSource);
     }
 
-    public void insert(String sql, Object... args) {
-        try {
-            this.queryRunner.update(sql, args);
-        } catch (SQLException e) {
-            LOGGER.error("Failed to run sql: " + sql, e);
-        }
+    public Future<Void> insert(String sql, Object... args) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                this.queryRunner.update(sql, args);
+            } catch (SQLException e) {
+                LOGGER.error("Failed to run sql: " + sql, e);
+            }
+        });
+    }
+
+    public <T> Future<Optional<T>> query(String sql, ResultSetHandler<T> handler, Object... args) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return Optional.ofNullable(this.queryRunner.query(sql, handler, args));
+            } catch (SQLException e) {
+                throw new IllegalStateException("Failed to query", e);
+            }
+        });
     }
 
     @Override
