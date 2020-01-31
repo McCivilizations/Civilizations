@@ -10,19 +10,19 @@ import java.util.concurrent.Future;
 
 public class ClientCivilizationRepository implements ICivilizationRepository {
     @Override
-    public Future<Optional<Civilization>> getCivilizationByName(String name) {
+    public CompletableFuture<Optional<Civilization>> getCivilizationByName(String name) {
         Civilizations.LOGGER.error("Querying on Client! This is an Error");
         return CompletableFuture.completedFuture(Optional.empty());
     }
 
     @Override
-    public Future<Optional<Civilization>> getCivilizationById(long id) {
+    public CompletableFuture<Optional<Civilization>> getCivilizationById(long id) {
         Civilizations.LOGGER.error("Querying on Client! This is an Error");
         return CompletableFuture.completedFuture(Optional.empty());
     }
 
     @Override
-    public Future<Civilization> createCivilization(Civilization civilization) {
+    public CompletableFuture<Civilization> createCivilization(Civilization civilization) {
         Civilizations.LOGGER.error("Creating on Client! This is an Error");
         return CompletableFuture.completedFuture(civilization);
     }

@@ -1,10 +1,16 @@
 package com.mccivilizations.civilizations.api;
 
+import com.mccivilizations.civilizations.api.citizen.ICitizen;
 import com.mccivilizations.civilizations.api.repository.ICivilizationRepository;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 
 import java.util.Objects;
 
 public class CivilizationsAPI {
+    @CapabilityInject(ICitizen.class)
+    public static Capability<ICitizen> CITIZEN_CAP;
+
     private static CivilizationsAPI instance;
 
     private ICivilizationRepository civilizationRepository;

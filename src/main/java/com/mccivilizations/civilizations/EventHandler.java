@@ -1,32 +1,33 @@
 package com.mccivilizations.civilizations;
 
-import com.mccivilizations.civilizations.block.StandingCivilizationMarkerBlock;
-import com.mccivilizations.civilizations.content.CivBlocks;
-import com.mccivilizations.civilizations.tileentity.CivilizationMarkerTileEntity;
+import com.mccivilizations.civilizations.api.CivilizationsAPI;
+import com.mccivilizations.civilizations.api.citizen.CitizenCapabilityProvider;
+import com.mccivilizations.civilizations.container.NewCivilizationContainerProvider;
+import com.mccivilizations.civilizations.content.CivEnchants;
 import com.mccivilizations.database.Database;
 import net.minecraft.block.AbstractBannerBlock;
-import net.minecraft.block.BannerBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.Items;
-import net.minecraft.tileentity.BannerTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-
-import java.util.Objects;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 @EventBusSubscriber(modid = Civilizations.MODID, bus = Bus.FORGE)
 public class EventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> Database.getInstance().insert(
-                "insert into player(name, uuid) values(?, ?)", event.getPlayer().getName().getFormattedText(),
+                "insert into players(name, uuid) values(?, ?)", event.getPlayer().getName().getFormattedText(),
                 event.getPlayer().getUniqueID().toString()
         ));
     }
@@ -35,26 +36,27 @@ public class EventHandler {
     public static void onBlockRightClick(PlayerInteractEvent.RightClickBlock rightClickBlockEvent) {
         BlockState blockState = rightClickBlockEvent.getWorld().getBlockState(rightClickBlockEvent.getPos());
         if (blockState.getBlock() instanceof AbstractBannerBlock) {
-            if (rightClickBlockEvent.getItemStack().getItem() == Items.STICK) {
-                rightClickBlockEvent.setUseBlock(Event.Result.DENY);
-                rightClickBlockEvent.setUseItem(Event.Result.ALLOW);
-                TileEntity tileEntity = rightClickBlockEvent.getWorld().getTileEntity(rightClickBlockEvent.getPos());
-                if (tileEntity instanceof BannerTileEntity) {
-                    BannerTileEntity bannerTileEntity = (BannerTileEntity) tileEntity;
-                    AbstractBannerBlock abstractBannerBlock = (AbstractBannerBlock) blockState.getBlock();
-                    if (abstractBannerBlock instanceof BannerBlock) {
-                        rightClickBlockEvent.getWorld().setBlockState(rightClickBlockEvent.getPos(),
-                                Objects.requireNonNull(CivBlocks.STANDING_MARKER.get()).getDefaultState()
-                                        .with(StandingCivilizationMarkerBlock.ROTATION, blockState.get(BannerBlock.ROTATION)));
-                    }
+            if (EnchantmentHelper.getEnchantmentLevel(CivEnchants.LEADERSHIP.get(), rightClickBlockEvent.getItemStack()) > 0) {
+                if (!rightClickBlockEvent.getWorld().isRemote()) {
+                    rightClickBlockEvent.getPlayer().getCapability(CivilizationsAPI.CITIZEN_CAP)
+                            .ifPresent(citizen -> {
+                                if (citizen.getCivilization() == null) {
+                                    NetworkHooks.openGui((ServerPlayerEntity) rightClickBlockEvent.getPlayer(),
+                                            new NewCivilizationContainerProvider(rightClickBlockEvent.getPos()),
+                                            packetBuffer -> packetBuffer.writeBlockPos(rightClickBlockEvent.getPos()));
+                                }
 
-                    TileEntity newTileEntity = rightClickBlockEvent.getWorld().getTileEntity(rightClickBlockEvent.getPos());
-                    if (newTileEntity instanceof CivilizationMarkerTileEntity) {
-                        CivilizationMarkerTileEntity civMarkerTileEntity = (CivilizationMarkerTileEntity) newTileEntity;
-                        civMarkerTileEntity.setPatternFromBanner(abstractBannerBlock, bannerTileEntity.serializeNBT());
-                    }
+                            });
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void attachCapabilities(AttachCapabilitiesEvent<Entity> attachCapabilitiesEvent) {
+        if (attachCapabilitiesEvent.getObject() instanceof PlayerEntity) {
+            attachCapabilitiesEvent.addCapability(new ResourceLocation(Civilizations.MODID, "citizen"),
+                    new CitizenCapabilityProvider());
         }
     }
 }

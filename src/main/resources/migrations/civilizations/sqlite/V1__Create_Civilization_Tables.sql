@@ -1,4 +1,4 @@
-CREATE TABLE civilization
+CREATE TABLE civilizations
 (
   id       INTEGER PRIMARY KEY AUTOINCREMENT,
   name     TEXT       NOT NULL UNIQUE,
@@ -7,28 +7,28 @@ CREATE TABLE civilization
   flag_pattern TEXT NOT NULL
 );
 
-CREATE TABLE position
+CREATE TABLE positions
 (
   id   INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL
 );
 
-CREATE TABLE player
+CREATE TABLE players
 (
   id   INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   uuid TEXT NOT NULL UNIQUE ON CONFLICT REPLACE
 );
 
-CREATE TABLE player_position
+CREATE TABLE player_positions
 (
   id     INTEGER PRIMARY KEY AUTOINCREMENT,
   ply_id INTEGER NOT NULL UNIQUE,
   civ_id INTEGER NOT NULL,
   pos_id INTEGER NOT NULL,
-  FOREIGN KEY (ply_id) REFERENCES player (id),
-  FOREIGN KEY (civ_id) REFERENCES civilization (id),
-  FOREIGN KEY (pos_id) REFERENCES position (id)
+  FOREIGN KEY (ply_id) REFERENCES players (id),
+  FOREIGN KEY (civ_id) REFERENCES civilizations (id),
+  FOREIGN KEY (pos_id) REFERENCES positions (id)
 )
 
 

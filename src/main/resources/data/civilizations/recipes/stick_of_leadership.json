@@ -1,0 +1,18 @@
+{
+  "type": "titanium:shapeless_enchnat",
+  "ingredients": [
+    {
+      "tag": "forge:ingots/gold"
+    },
+    {
+      "item": "minecraft:stick"
+    }
+  ],
+  "result": {
+    "item": "minecraft:stick",
+    "enchantments": {
+      "name": "civilizations:leadership",
+      "level": 1
+    }
+  }
+}

@@ -49,7 +49,7 @@ public class Database implements AutoCloseable {
         });
     }
 
-    public <T> Future<Optional<T>> query(String sql, ResultSetHandler<T> handler, Object... args) {
+    public <T> CompletableFuture<Optional<T>> query(String sql, ResultSetHandler<T> handler, Object... args) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return Optional.ofNullable(this.queryRunner.query(sql, handler, args));
