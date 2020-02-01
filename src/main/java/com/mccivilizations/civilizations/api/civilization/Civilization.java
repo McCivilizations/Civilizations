@@ -6,12 +6,17 @@ public class Civilization {
     private final long id;
     private final String name;
     private final String isoCode;
+    private final String teamName;
     private final CompoundNBT flagPattern;
 
     public Civilization(long id, String name, String isoCode, CompoundNBT flagPattern) {
+        this(id, name, isoCode, name.toLowerCase(), flagPattern);
+    }
+    public Civilization(long id, String name, String isoCode, String teamName, CompoundNBT flagPattern) {
         this.id = id;
         this.name = name;
         this.isoCode = isoCode;
+        this.teamName = teamName;
         this.flagPattern = flagPattern;
     }
 
@@ -29,5 +34,9 @@ public class Civilization {
 
     public CompoundNBT getFlagPattern() {
         return this.flagPattern;
+    }
+
+    public String getTeamName() {
+        return teamName;
     }
 }

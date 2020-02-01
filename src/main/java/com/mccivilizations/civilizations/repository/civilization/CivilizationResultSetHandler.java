@@ -16,7 +16,7 @@ public class CivilizationResultSetHandler implements ResultSetHandler<Civilizati
                     rs.getLong("id"),
                     rs.getString("name"),
                     rs.getString("iso_code"),
-                    JsonToNBT.getTagFromJson(rs.getString("flag_pattern"))
+                    teamName, JsonToNBT.getTagFromJson(rs.getString("flag_pattern"))
             );
         } catch (CommandSyntaxException e) {
             throw new SQLException("Failed to find valid flag_pattern");
