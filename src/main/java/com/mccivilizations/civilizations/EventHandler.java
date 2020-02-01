@@ -26,10 +26,11 @@ import net.minecraftforge.fml.network.NetworkHooks;
 public class EventHandler {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        DistExecutor.runWhenOn(Dist.DEDICATED_SERVER, () -> () -> Database.getInstance().insert(
-                "insert into players(name, uuid) values(?, ?)", event.getPlayer().getName().getFormattedText(),
+        Database.getInstance().insert(
+                "insert into players(name, uuid) values(?, ?)",
+                event.getPlayer().getName().getFormattedText(),
                 event.getPlayer().getUniqueID().toString()
-        ));
+        );
     }
 
     @SubscribeEvent
@@ -45,7 +46,6 @@ public class EventHandler {
                                             new NewCivilizationContainerProvider(rightClickBlockEvent.getPos()),
                                             packetBuffer -> packetBuffer.writeBlockPos(rightClickBlockEvent.getPos()));
                                 }
-
                             });
                 }
             }

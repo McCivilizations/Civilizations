@@ -97,7 +97,7 @@ public class Database implements AutoCloseable {
         return new Database(dataSource);
     }
 
-    private static String handleConnectionReplace(File mcWorldDirect, String connectionInfo) {
+    private static String handleConnectionReplace(MinecraftServer server, String connectionInfo) {
         connectionInfo = connectionInfo.replace("${minecraft}",
                 mcWorldDirect.getAbsolutePath());
         return connectionInfo;

@@ -3,25 +3,20 @@ package com.mccivilizations.civilizations;
 import com.mccivilizations.civilizations.api.CivilizationsAPI;
 import com.mccivilizations.civilizations.api.citizen.Citizen;
 import com.mccivilizations.civilizations.api.citizen.ICitizen;
-import com.mccivilizations.civilizations.container.NewCivilizationContainer;
 import com.mccivilizations.civilizations.content.CivContainers;
 import com.mccivilizations.civilizations.content.CivEnchants;
 import com.mccivilizations.civilizations.network.NetworkHandler;
 import com.mccivilizations.civilizations.network.NewCivilizationPacket;
-import com.mccivilizations.civilizations.repository.civilization.ClientCivilizationRepository;
-import com.mccivilizations.civilizations.repository.civilization.ServerCivilizationRepository;
+import com.mccivilizations.civilizations.repository.civilization.CivilizationRepository;
 import com.mccivilizations.civilizations.screen.NewCivilizationScreen;
 import com.mccivilizations.database.Database;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -29,9 +24,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @Mod(Civilizations.MODID)
 public class Civilizations {
@@ -51,9 +44,7 @@ public class Civilizations {
 
         Database.setup();
 
-        CivilizationsAPI.getInstance().setCivilizationRepository(
-                DistExecutor.runForDist(() -> ClientCivilizationRepository::new, () -> ServerCivilizationRepository::new)
-        );
+        CivilizationsAPI.getInstance().setCivilizationRepository(new CivilizationRepository());
 
         networkHandler = new NetworkHandler();
         networkHandler.register(NewCivilizationPacket.class, NewCivilizationPacket::encode,

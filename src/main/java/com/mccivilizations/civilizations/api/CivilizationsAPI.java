@@ -1,7 +1,7 @@
 package com.mccivilizations.civilizations.api;
 
 import com.mccivilizations.civilizations.api.citizen.ICitizen;
-import com.mccivilizations.civilizations.api.repository.ICivilizationRepository;
+import com.mccivilizations.civilizations.api.civilization.ICivilizationRepository;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 

@@ -12,7 +12,7 @@ public class DBConfig {
 
     public DBConfig(ForgeConfigSpec.Builder builder) {
         databaseType = builder.define("Database Type", "SQLite");
-        connectionInfo = builder.define("Connection Info", "${minecraft}/civilizations.db");
+        connectionInfo = builder.define("Connection Info", "database.db");
         this.spec = builder.build();
     }
 
