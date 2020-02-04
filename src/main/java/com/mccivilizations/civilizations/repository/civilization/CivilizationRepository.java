@@ -2,33 +2,52 @@ package com.mccivilizations.civilizations.repository.civilization;
 
 import com.mccivilizations.civilizations.api.civilization.Civilization;
 import com.mccivilizations.civilizations.api.civilization.ICivilizationRepository;
+import com.mccivilizations.civilizations.api.repository.IResultSetHandler;
+import com.mccivilizations.civilizations.repository.ResultSetWrapper;
 import com.mccivilizations.database.Database;
-import net.minecraft.world.IWorldReader;
 import org.apache.commons.dbutils.ResultSetHandler;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class CivilizationRepository implements ICivilizationRepository {
-    private final ResultSetHandler<Civilization> civilizationResultSetHandler = new CivilizationResultSetHandler();
+    private final IResultSetHandler<Civilization> civilizationResultSetHandler = new CivilizationResultSetHandler();
+    private final ResultSetHandler<Civilization> resultSetHandler = new ResultSetWrapper<>(civilizationResultSetHandler);
 
     @Override
-    public CompletableFuture<Optional<Civilization>> getCivilizationByName(String name) {
+    public CompletableFuture<Optional<Civilization>> getByName(String name) {
         return Database.getInstance().query("select id, name, iso_code, flag_pattern from civilizations where name = ?",
-                civilizationResultSetHandler, name);
+                resultSetHandler, name);
     }
 
     @Override
-    public CompletableFuture<Optional<Civilization>> getCivilizationById(long id) {
+    public CompletableFuture<Optional<Civilization>> getById(long id) {
         return Database.getInstance().query("select id, name, iso_code, flag_pattern, team_name from civilizations where id = ?",
-                civilizationResultSetHandler, id);
+                resultSetHandler, id);
     }
 
     @Override
-    public CompletableFuture<Civilization> createCivilization(Civilization civilization) {
+    public CompletableFuture<Integer> delete(Civilization value) {
+        return Database.getInstance().update("delete from civilizations where id = ?", value.getId());
+    }
+
+    @Override
+    public IResultSetHandler<Civilization> getResultSetHandler() {
+        return civilizationResultSetHandler;
+    }
+
+    @Override
+    public CompletableFuture<Civilization> create(Civilization civilization) {
         Database.getInstance().insert("insert into civilizations(name, iso_code, flag_pattern, team_name) values(?, ?, ?, ?)",
                 civilization.getName(), civilization.getIsoCode(), civilization.getFlagPattern().toString(),
                 civilization.getTeamName());
-        return this.getCivilizationByName(civilization.getName()).thenApplyAsync(Optional::get);
+        return this.getByName(civilization.getName()).thenApplyAsync(Optional::get);
+    }
+
+    @Override
+    public CompletableFuture<Integer> update(Civilization value) {
+        return Database.getInstance().update("update civilization set name = ?, iso_code = ?, flag_patter = ?, " +
+                        "team_name = ? where id = ?", value.getName(), value.getIsoCode(),
+                value.getFlagPattern().toString(), value.getTeamName(), value.getId());
     }
 }

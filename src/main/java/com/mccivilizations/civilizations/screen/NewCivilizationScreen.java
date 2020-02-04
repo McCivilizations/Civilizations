@@ -1,20 +1,21 @@
 package com.mccivilizations.civilizations.screen;
 
+import com.hrznstudio.titanium.client.screen.container.BasicContainerScreen;
 import com.mccivilizations.civilizations.Civilizations;
 import com.mccivilizations.civilizations.container.NewCivilizationContainer;
 import com.mccivilizations.civilizations.network.NewCivilizationPacket;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.text.ITextComponent;
 
-public class NewCivilizationScreen extends ContainerScreen<NewCivilizationContainer> {
+import javax.annotation.Nonnull;
+import java.util.Objects;
+
+public class NewCivilizationScreen extends BasicContainerScreen<NewCivilizationContainer> {
     private TextFieldWidget nameField;
-    private Button createButton;
 
     public NewCivilizationScreen(NewCivilizationContainer screenContainer, PlayerInventory inv, ITextComponent title) {
         super(screenContainer, inv, title);
@@ -39,33 +40,35 @@ public class NewCivilizationScreen extends ContainerScreen<NewCivilizationContai
             Civilizations.instance.networkHandler.sendPacket(new NewCivilizationPacket(
                     nameField.getText(),
                     nameField.getText(),
-                    container.getBannerPos()
+                    this.getContainer().getBannerPos()
             ));
         }));
         this.setFocusedDefault(this.nameField);
     }
 
     @Override
-    public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
         this.renderBackground();
-        super.render(p_render_1_, p_render_2_, p_render_3_);
+        super.render(mouseX, mouseY, partialTicks);
         RenderSystem.disableBlend();
-        this.nameField.render(p_render_1_, p_render_2_, p_render_3_);
-        this.renderHoveredToolTip(p_render_1_, p_render_2_);
+        this.nameField.render(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
     }
 
-    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-        if (p_keyPressed_1_ == 256) {
-            this.minecraft.player.closeScreen();
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
+            Objects.requireNonNull(this.getMinecraft().player).closeScreen();
         }
 
-        return this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) || this.nameField.canWrite() ||
-                super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+        return this.nameField.keyPressed(keyCode, scanCode, modifiers) || this.nameField.canWrite() ||
+                super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    public void resize(Minecraft p_resize_1_, int p_resize_2_, int p_resize_3_) {
+    @Override
+    public void resize(@Nonnull Minecraft minecraft, int width, int height) {
         String s = this.nameField.getText();
-        this.init(p_resize_1_, p_resize_2_, p_resize_3_);
+        this.init(minecraft, width, height);
         this.nameField.setText(s);
     }
 

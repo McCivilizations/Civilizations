@@ -1,6 +1,7 @@
 package com.mccivilizations.civilizations.api.citizen;
 
 import com.mccivilizations.civilizations.api.CivilizationsAPI;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -11,8 +12,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class CitizenCapabilityProvider implements ICapabilitySerializable<LongNBT> {
-    private final ICitizen citizen;
+public class CitizenCapabilityProvider implements ICapabilitySerializable<CompoundNBT> {
+    private final Citizen citizen;
     private final LazyOptional<ICitizen> citizenLazyOptional;
 
     public CitizenCapabilityProvider() {
@@ -27,18 +28,12 @@ public class CitizenCapabilityProvider implements ICapabilitySerializable<LongNB
     }
 
     @Override
-    public LongNBT serializeNBT() {
-        return Optional.ofNullable(citizen.getCivilization())
-                .map(civilization -> LongNBT.valueOf(civilization.getId()))
-                .orElseGet(() -> LongNBT.valueOf(-1));
+    public CompoundNBT serializeNBT() {
+        return citizen.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(LongNBT nbt) {
-        if (nbt.getLong() > 0) {
-            CivilizationsAPI.getInstance().getCivilizationRepository()
-                    .getCivilizationById(nbt.getLong())
-                    .thenAcceptAsync(civilization -> civilization.ifPresent(citizen::setCivilization));
-        }
+    public void deserializeNBT(CompoundNBT nbt) {
+        citizen.deserializeNBT(nbt);
     }
 }

@@ -17,12 +17,10 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.Location;
 
 import javax.sql.DataSource;
-import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class Database implements AutoCloseable {
     private static final Logger LOGGER = LogManager.getLogger(Database.class);
@@ -39,12 +37,23 @@ public class Database implements AutoCloseable {
         this.queryRunner = new QueryRunner(dataSource);
     }
 
-    public Future<Void> insert(String sql, Object... args) {
+    public CompletableFuture<Void> insert(String sql, Object... args) {
         return CompletableFuture.runAsync(() -> {
             try {
                 this.queryRunner.update(sql, args);
             } catch (SQLException e) {
                 LOGGER.error("Failed to run sql: " + sql, e);
+            }
+        });
+    }
+
+    public CompletableFuture<Integer> update(String sql, Object... args) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return this.queryRunner.update(sql, args);
+            } catch (SQLException e) {
+                LOGGER.error("Failed to run sql: " + sql);
+                return 0;
             }
         });
     }
@@ -85,7 +94,7 @@ public class Database implements AutoCloseable {
             LOGGER.error("Failed to Initialize Database Driver");
         }
 
-        DataSource dataSource = dbSupport.createDataSource(handleConnectionReplace(server.getDataDirectory(),
+        DataSource dataSource = dbSupport.createDataSource(handleConnectionReplace(server,
                 DBConfig.instance.connectionInfo.get()));
 
         Flyway.configure()
@@ -98,8 +107,11 @@ public class Database implements AutoCloseable {
     }
 
     private static String handleConnectionReplace(MinecraftServer server, String connectionInfo) {
-        connectionInfo = connectionInfo.replace("${minecraft}",
-                mcWorldDirect.getAbsolutePath());
+        connectionInfo = connectionInfo.replace("${world_folder}",
+                server.getActiveAnvilConverter()
+                        .getFile(server.getFolderName(), ".")
+                        .getParentFile()
+                        .getAbsolutePath());
         return connectionInfo;
     }
 

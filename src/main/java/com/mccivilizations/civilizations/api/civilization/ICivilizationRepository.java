@@ -1,12 +1,10 @@
 package com.mccivilizations.civilizations.api.civilization;
 
+import com.mccivilizations.civilizations.api.repository.IRepository;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public interface ICivilizationRepository {
-    CompletableFuture<Optional<Civilization>> getCivilizationByName(String name);
-
-    CompletableFuture<Optional<Civilization>> getCivilizationById(long id);
-
-    CompletableFuture<Civilization> createCivilization(Civilization civilization);
+public interface ICivilizationRepository extends IRepository<Civilization> {
+    CompletableFuture<Optional<Civilization>> getByName(String name);
 }
