@@ -63,7 +63,8 @@ public class Database implements AutoCloseable {
             try {
                 return Optional.ofNullable(this.queryRunner.query(sql, handler, args));
             } catch (SQLException e) {
-                throw new IllegalStateException("Failed to query", e);
+                LOGGER.error("Failed to Query: " + sql, e);
+                return Optional.empty();
             }
         });
     }
@@ -119,7 +120,7 @@ public class Database implements AutoCloseable {
         if (!setup) {
             MinecraftForge.EVENT_BUS.addListener(Database::handleServerStart);
             MinecraftForge.EVENT_BUS.addListener(Database::handleServerStop);
-            ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DBConfig.initialize());
+            ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DBConfig.initialize());
             GatherDatabaseSupportEvent event = new GatherDatabaseSupportEvent();
             event.addDatabaseSupport(new SQLiteDB());
             MinecraftForge.EVENT_BUS.post(event);

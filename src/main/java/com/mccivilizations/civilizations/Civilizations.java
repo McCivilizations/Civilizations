@@ -69,7 +69,7 @@ public class Civilizations {
             public void readNBT(Capability<ICitizen> capability, ICitizen instance, Direction side, INBT nbt) {
                 if (nbt instanceof LongNBT && ((LongNBT) nbt).getLong() > 0) {
                     CivilizationsAPI.getInstance().getCivilizationRepository()
-                            .getCivilizationById(((LongNBT) nbt).getLong())
+                            .getById(((LongNBT) nbt).getLong())
                             .thenAcceptAsync(civilization -> civilization.ifPresent(instance::setCivilization));
                 }
             }

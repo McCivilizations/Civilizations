@@ -16,7 +16,7 @@ public class CivilizationRepository implements ICivilizationRepository {
 
     @Override
     public CompletableFuture<Optional<Civilization>> getByName(String name) {
-        return Database.getInstance().query("select id, name, iso_code, flag_pattern from civilizations where name = ?",
+        return Database.getInstance().query("select id, name, iso_code, flag_pattern, team_name from civilizations where name = ?",
                 resultSetHandler, name);
     }
 
@@ -41,12 +41,14 @@ public class CivilizationRepository implements ICivilizationRepository {
         Database.getInstance().insert("insert into civilizations(name, iso_code, flag_pattern, team_name) values(?, ?, ?, ?)",
                 civilization.getName(), civilization.getIsoCode(), civilization.getFlagPattern().toString(),
                 civilization.getTeamName());
-        return this.getByName(civilization.getName()).thenApplyAsync(Optional::get);
+        return this.getByName(civilization.getName()).thenComposeAsync(optional ->
+                optional.map(CompletableFuture::completedFuture)
+                        .orElseThrow(() -> new IllegalStateException("Failed to Find Civilization after Creation")));
     }
 
     @Override
     public CompletableFuture<Integer> update(Civilization value) {
-        return Database.getInstance().update("update civilization set name = ?, iso_code = ?, flag_patter = ?, " +
+        return Database.getInstance().update("update civilization ste name = ?, iso_code = ?, flag_patter = ?, " +
                         "team_name = ? where id = ?", value.getName(), value.getIsoCode(),
                 value.getFlagPattern().toString(), value.getTeamName(), value.getId());
     }

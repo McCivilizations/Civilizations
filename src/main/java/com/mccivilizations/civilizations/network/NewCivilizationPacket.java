@@ -10,7 +10,6 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.tileentity.BannerTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.Objects;
@@ -37,12 +36,11 @@ public class NewCivilizationPacket {
         ServerPlayerEntity playerEntity = Objects.requireNonNull(contextSupplier.get().getSender());
         Scoreboard scoreboard = Objects.requireNonNull(playerEntity.getServerWorld()).getScoreboard();
         contextSupplier.get().enqueueWork(() -> CivilizationsAPI.getInstance().getCivilizationRepository()
-                .createCivilization(new Civilization(-1, name, isoCode, getFlagInfo(playerEntity)))
+                .create(new Civilization(-1, name, isoCode, getFlagInfo(playerEntity)))
                 .thenAcceptAsync(civilization -> {
                     ScorePlayerTeam team = scoreboard.createTeam(civilization.getTeamName());
                     scoreboard.addPlayerToTeam(playerEntity.getScoreboardName(), team);
-                    playerEntity
-                            .getCapability(CivilizationsAPI.CITIZEN_CAP)
+                    playerEntity.getCapability(CivilizationsAPI.CITIZEN_CAP)
                             .ifPresent(citizen -> citizen.setCivilization(civilization));
                 }));
         contextSupplier.get().setPacketHandled(true);
