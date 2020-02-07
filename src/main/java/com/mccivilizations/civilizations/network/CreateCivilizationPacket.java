@@ -15,12 +15,12 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class NewCivilizationPacket {
+public class CreateCivilizationPacket {
     private final String name;
     private final String isoCode;
     private final BlockPos bannerPos;
 
-    public NewCivilizationPacket(String name, String isoCode, BlockPos bannerPos) {
+    public CreateCivilizationPacket(String name, String isoCode, BlockPos bannerPos) {
         this.name = name;
         this.isoCode = isoCode;
         this.bannerPos = bannerPos;
@@ -57,8 +57,8 @@ public class NewCivilizationPacket {
         return compoundNBT;
     }
 
-    public static NewCivilizationPacket decode(PacketBuffer packetBuffer) {
-        return new NewCivilizationPacket(
+    public static CreateCivilizationPacket decode(PacketBuffer packetBuffer) {
+        return new CreateCivilizationPacket(
                 packetBuffer.readString(32767),
                 packetBuffer.readString(32767),
                 packetBuffer.readBlockPos()

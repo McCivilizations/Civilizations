@@ -3,24 +3,17 @@ package com.mccivilizations.civilizations.container;
 import com.mccivilizations.civilizations.content.CivContainers;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 
-public class NewCivilizationContainer extends Container {
-    private final BlockPos bannerPos;
+public class ManageCivilizationContainer extends Container {
 
-    public NewCivilizationContainer(int id, BlockPos bannerPos) {
-        super(CivContainers.NEW_CIVILIZATION.get(), id);
-        this.bannerPos = bannerPos;
+    public ManageCivilizationContainer(int id) {
+        super(CivContainers.MANAGE_CIVILIZATION.get(), id);
     }
 
     @Override
     public boolean canInteractWith(@Nonnull PlayerEntity player) {
         return true;
-    }
-
-    public BlockPos getBannerPos() {
-        return bannerPos;
     }
 }

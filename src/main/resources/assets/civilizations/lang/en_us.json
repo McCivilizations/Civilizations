@@ -1,3 +1,7 @@
 {
-  "enchantment.civilizations.leadership": "Leadership"
+  "enchantment.civilizations.leadership": "Leadership",
+  "container.civilizations.create_civilization": "Create Civilization",
+  "container.civilizations.edit_civilization": "Manage Civilization",
+  "button.civilizations.create": "Create",
+  "button.civilizations.save": "Save"
 }

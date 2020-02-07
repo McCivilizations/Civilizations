@@ -1,7 +1,8 @@
 package com.mccivilizations.civilizations.content;
 
 import com.mccivilizations.civilizations.Civilizations;
-import com.mccivilizations.civilizations.container.NewCivilizationContainer;
+import com.mccivilizations.civilizations.container.ManageCivilizationContainer;
+import com.mccivilizations.civilizations.container.CreateCivilizationContainer;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -13,9 +14,12 @@ public class CivContainers {
     private static final DeferredRegister<ContainerType<?>> CONTAINER_TYPES = new DeferredRegister<>(
             ForgeRegistries.CONTAINERS, Civilizations.MODID);
 
-    public static final RegistryObject<ContainerType<NewCivilizationContainer>> NEW_CIVILIZATION = CONTAINER_TYPES.register(
-            "new_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->
-                    new NewCivilizationContainer(windowId, data.readBlockPos())));
+    public static final RegistryObject<ContainerType<CreateCivilizationContainer>> CREATE_CIVILIZATION = CONTAINER_TYPES.register(
+            "create_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->
+                    new CreateCivilizationContainer(windowId, data.readBlockPos())));
+    public static final RegistryObject<ContainerType<ManageCivilizationContainer>> MANAGE_CIVILIZATION = CONTAINER_TYPES.register(
+            "manage_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->
+                    new ManageCivilizationContainer(windowId)));
 
     public static void register(IEventBus eventBus) {
         CONTAINER_TYPES.register(eventBus);

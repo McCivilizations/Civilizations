@@ -5,10 +5,12 @@ import com.mccivilizations.civilizations.api.citizen.Citizen;
 import com.mccivilizations.civilizations.api.citizen.ICitizen;
 import com.mccivilizations.civilizations.content.CivContainers;
 import com.mccivilizations.civilizations.content.CivEnchants;
+import com.mccivilizations.civilizations.network.CreateCivilizationPacket;
+import com.mccivilizations.civilizations.network.LeaveCivilizationPacket;
 import com.mccivilizations.civilizations.network.NetworkHandler;
-import com.mccivilizations.civilizations.network.NewCivilizationPacket;
 import com.mccivilizations.civilizations.repository.civilization.CivilizationRepository;
-import com.mccivilizations.civilizations.screen.NewCivilizationScreen;
+import com.mccivilizations.civilizations.screen.ManageCivilizationScreen;
+import com.mccivilizations.civilizations.screen.CreateCivilizationScreen;
 import com.mccivilizations.database.Database;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.nbt.INBT;
@@ -47,8 +49,10 @@ public class Civilizations {
         CivilizationsAPI.getInstance().setCivilizationRepository(new CivilizationRepository());
 
         networkHandler = new NetworkHandler();
-        networkHandler.register(NewCivilizationPacket.class, NewCivilizationPacket::encode,
-                NewCivilizationPacket::decode, NewCivilizationPacket::handle);
+        networkHandler.register(CreateCivilizationPacket.class, CreateCivilizationPacket::encode,
+                CreateCivilizationPacket::decode, CreateCivilizationPacket::handle);
+        networkHandler.register(LeaveCivilizationPacket.class, LeaveCivilizationPacket::encode,
+                LeaveCivilizationPacket::decode, LeaveCivilizationPacket::handle);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
@@ -77,6 +81,8 @@ public class Civilizations {
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(CivContainers.NEW_CIVILIZATION.get(), NewCivilizationScreen::new);
+        ScreenManager.registerFactory(CivContainers.CREATE_CIVILIZATION.get(), CreateCivilizationScreen::new);
+        ScreenManager.registerFactory(CivContainers.MANAGE_CIVILIZATION.get(), ManageCivilizationScreen::new);
+
     }
 }

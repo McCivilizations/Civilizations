@@ -3,13 +3,13 @@ package com.mccivilizations.civilizations;
 import com.mccivilizations.civilizations.api.CivilizationsAPI;
 import com.mccivilizations.civilizations.api.citizen.CitizenCapabilityProvider;
 import com.mccivilizations.civilizations.api.civilization.Civilization;
-import com.mccivilizations.civilizations.container.NewCivilizationContainerProvider;
+import com.mccivilizations.civilizations.container.ManageCivilizationContainerProvider;
+import com.mccivilizations.civilizations.container.CreateCivilizationContainerProvider;
 import com.mccivilizations.civilizations.content.CivEnchants;
 import com.mccivilizations.database.Database;
 import net.minecraft.block.AbstractBannerBlock;
 import net.minecraft.block.BannerBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.WallBannerBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,12 +20,10 @@ import net.minecraft.tileentity.BannerTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -52,7 +50,7 @@ public class EventHandler {
                             .ifPresent(citizen -> {
                                 if (citizen.getCivilization() == null) {
                                     NetworkHooks.openGui((ServerPlayerEntity) rightClickBlockEvent.getPlayer(),
-                                            new NewCivilizationContainerProvider(rightClickBlockEvent.getPos()),
+                                            new CreateCivilizationContainerProvider(rightClickBlockEvent.getPos()),
                                             packetBuffer -> packetBuffer.writeBlockPos(rightClickBlockEvent.getPos()));
                                 } else {
                                     Civilization civilization = citizen.getCivilization();
@@ -71,6 +69,9 @@ public class EventHandler {
                                         tileEntity.read(compoundNBT);
                                         world.notifyBlockUpdate(rightClickBlockEvent.getPos(), newBlockState, newBlockState, 3);
                                     }
+
+                                    NetworkHooks.openGui((ServerPlayerEntity) rightClickBlockEvent.getPlayer(),
+                                            new ManageCivilizationContainerProvider());
                                 }
                             });
                 }
