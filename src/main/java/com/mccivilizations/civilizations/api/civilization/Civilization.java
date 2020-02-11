@@ -80,4 +80,10 @@ public class Civilization implements INBTSerializable<CompoundNBT> {
         this.setFlag(nbt.getCompound("flag"));
         this.uniqueId = nbt.getUniqueId("uniqueId");
     }
+
+    public static Civilization load(CompoundNBT nbt) {
+        Civilization civilization = new Civilization();
+        civilization.deserializeNBT(nbt);
+        return civilization;
+    }
 }
