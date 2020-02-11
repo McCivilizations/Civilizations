@@ -12,7 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class CivContainers {
     private static final DeferredRegister<ContainerType<?>> CONTAINER_TYPES = new DeferredRegister<>(
-            ForgeRegistries.CONTAINERS, Civilizations.MODID);
+            ForgeRegistries.CONTAINERS, Civilizations.ID);
 
     public static final RegistryObject<ContainerType<CreateCivilizationContainer>> CREATE_CIVILIZATION = CONTAINER_TYPES.register(
             "create_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->

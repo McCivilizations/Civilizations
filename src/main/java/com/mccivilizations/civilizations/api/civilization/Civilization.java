@@ -1,42 +1,83 @@
 package com.mccivilizations.civilizations.api.civilization;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public class Civilization {
-    private final long id;
-    private final String name;
-    private final String isoCode;
-    private final String teamName;
-    private final CompoundNBT flagPattern;
+import java.util.UUID;
 
-    public Civilization(long id, String name, String isoCode, CompoundNBT flagPattern) {
-        this(id, name, isoCode, name.toLowerCase(), flagPattern);
-    }
-    public Civilization(long id, String name, String isoCode, String teamName, CompoundNBT flagPattern) {
-        this.id = id;
-        this.name = name;
-        this.isoCode = isoCode;
-        this.teamName = teamName;
-        this.flagPattern = flagPattern;
-    }
+public class Civilization implements INBTSerializable<CompoundNBT> {
+    private String name;
+    private String isoCode;
+    private String team;
+    private CompoundNBT flag;
+    private UUID uniqueId;
 
-    public long getId() {
-        return this.id;
+    public Civilization() {
+        this.uniqueId = UUID.randomUUID();
     }
 
     public String getName() {
-        return this.name;
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getIsoCode() {
-        return this.isoCode;
+        return isoCode;
     }
 
-    public CompoundNBT getFlagPattern() {
-        return this.flagPattern;
+    public void setIsoCode(String isoCode) {
+        this.isoCode = isoCode;
     }
 
-    public String getTeamName() {
-        return teamName;
+    public String getTeam() {
+        return team;
+    }
+
+    public void setTeam(String team) {
+        this.team = team;
+    }
+
+    public CompoundNBT getFlag() {
+        return flag;
+    }
+
+    public void setFlag(CompoundNBT flag) {
+        this.flag = flag;
+    }
+
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
+    public void encode(PacketBuffer packetBuffer) {
+
+    }
+
+    public void decode(PacketBuffer packetBuffer) {
+
+    }
+
+    @Override
+    public CompoundNBT serializeNBT() {
+        CompoundNBT nbt = new CompoundNBT();
+        nbt.putString("name", this.getName());
+        nbt.putString("isoCode", this.getIsoCode());
+        nbt.putString("team", this.getTeam());
+        nbt.put("flag", this.getFlag());
+        nbt.putUniqueId("uniqueId", this.getUniqueId());
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundNBT nbt) {
+        this.setName(nbt.getString("name"));
+        this.setIsoCode(nbt.getString("isoCode"));
+        this.setTeam(nbt.getString("team"));
+        this.setFlag(nbt.getCompound("flag"));
+        this.uniqueId = nbt.getUniqueId("uniqueId");
     }
 }

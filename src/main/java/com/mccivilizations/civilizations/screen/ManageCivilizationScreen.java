@@ -24,10 +24,7 @@ public class ManageCivilizationScreen extends BasicContainerScreen<ManageCiviliz
         this.addButton(new Button(this.width / 2 + 2, this.height / 2 - 16, 48, 20,
                 new TranslationTextComponent("button.civilizations.save").getFormattedText(),
                 (button) -> {
-                    Objects.requireNonNull(Minecraft.getInstance().player)
-                            .getCapability(CivilizationsAPI.CITIZEN_CAP)
-                            .ifPresent(citizen -> citizen.setCivilization(null));
-                    Civilizations.instance.networkHandler.sendPacket(new LeaveCivilizationPacket());
+                    Civilizations.instance.networkHandler.sendPacket(new LeaveCivilizationPacket(null));
                     Minecraft.getInstance().displayGuiScreen(null);
                 }));
     }

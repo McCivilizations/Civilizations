@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class CivEnchants {
     private static final DeferredRegister<Enchantment> ENCHANTMENTS = new DeferredRegister<>(
-            ForgeRegistries.ENCHANTMENTS, Civilizations.MODID);
+            ForgeRegistries.ENCHANTMENTS, Civilizations.ID);
 
     public static final RegistryObject<LeadershipEnchantment> LEADERSHIP = ENCHANTMENTS.register("leadership",
             LeadershipEnchantment::new);
