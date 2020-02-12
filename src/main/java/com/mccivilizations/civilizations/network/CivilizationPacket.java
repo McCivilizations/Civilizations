@@ -19,6 +19,7 @@ public abstract class CivilizationPacket {
     }
 
     public void encode(PacketBuffer packetBuffer) {
+        packetBuffer.writeBoolean(civilization != null);
         this.getCivilization().encode(packetBuffer);
     }
 

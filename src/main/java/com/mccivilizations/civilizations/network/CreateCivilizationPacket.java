@@ -1,5 +1,6 @@
 package com.mccivilizations.civilizations.network;
 
+import com.mccivilizations.civilizations.Civilizations;
 import com.mccivilizations.civilizations.api.civilization.Civilization;
 import com.mccivilizations.civilizations.api.data.CivilizationData;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +19,11 @@ public class CreateCivilizationPacket extends CivilizationPacket {
 
     public static CreateCivilizationPacket decode(PacketBuffer packetBuffer) {
         Civilization civilization = new Civilization();
-        civilization.decode(packetBuffer);
+        if (packetBuffer.readBoolean()) {
+            civilization.decode(packetBuffer);
+        } else {
+            Civilizations.LOGGER.error("Failed to Find Civilization");
+        }
         return new CreateCivilizationPacket(civilization);
     }
 }
