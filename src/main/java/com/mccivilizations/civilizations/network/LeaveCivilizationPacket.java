@@ -1,10 +1,9 @@
 package com.mccivilizations.civilizations.network;
 
 import com.mccivilizations.civilizations.api.civilization.Civilization;
-import com.mccivilizations.civilizations.api.civilization.data.ICivilizationData;
+import com.mccivilizations.civilizations.api.data.CivilizationData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
 
 public class LeaveCivilizationPacket extends CivilizationPacket {
     public LeaveCivilizationPacket(Civilization civilization) {
@@ -12,9 +11,8 @@ public class LeaveCivilizationPacket extends CivilizationPacket {
     }
 
     @Override
-    public void alterCivilizationData(NetworkEvent.Context context, ICivilizationData civilizationData) {
-        PlayerEntity playerEntity = context.getSender();
-        civilizationData.removePlayerFrom(playerEntity, civilizationData.get(playerEntity));
+    public void alterCivilizationData(PlayerEntity playerEntity, CivilizationData civilizationData) {
+        civilizationData.removeEntityFromCivilization(playerEntity);
     }
 
     public static LeaveCivilizationPacket decode(PacketBuffer packetBuffer) {

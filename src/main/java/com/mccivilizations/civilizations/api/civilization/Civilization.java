@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.common.util.INBTSerializable;
 
+import java.util.Locale;
 import java.util.UUID;
 
 public class Civilization implements INBTSerializable<CompoundNBT> {
@@ -15,6 +16,14 @@ public class Civilization implements INBTSerializable<CompoundNBT> {
 
     public Civilization() {
         this.uniqueId = UUID.randomUUID();
+    }
+
+    public Civilization(String name, String isoCode, CompoundNBT flag) {
+        this();
+        this.name = name;
+        this.team = name.toLowerCase(Locale.ENGLISH);
+        this.isoCode = isoCode;
+        this.flag = flag;
     }
 
     public String getName() {

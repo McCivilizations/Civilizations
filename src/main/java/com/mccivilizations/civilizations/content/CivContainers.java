@@ -16,7 +16,7 @@ public class CivContainers {
 
     public static final RegistryObject<ContainerType<CreateCivilizationContainer>> CREATE_CIVILIZATION = CONTAINER_TYPES.register(
             "create_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->
-                    new CreateCivilizationContainer(windowId, data.readBlockPos())));
+                    new CreateCivilizationContainer(windowId, data.readCompoundTag())));
     public static final RegistryObject<ContainerType<ManageCivilizationContainer>> MANAGE_CIVILIZATION = CONTAINER_TYPES.register(
             "manage_civilization", () -> IForgeContainerType.create((windowId, inv, data) ->
                     new ManageCivilizationContainer(windowId)));

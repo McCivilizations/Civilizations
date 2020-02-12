@@ -4,6 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -14,17 +15,17 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 public class CreateCivilizationContainerProvider implements INamedContainerProvider {
-    private final BlockPos bannerPos;
+    private final CompoundNBT flagPattern;
 
-    public CreateCivilizationContainerProvider(BlockPos bannerPos) {
-        this.bannerPos = bannerPos;
+    public CreateCivilizationContainerProvider(CompoundNBT flagPattern) {
+        this.flagPattern = flagPattern;
     }
 
     @Nullable
     @Override
     @ParametersAreNonnullByDefault
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new CreateCivilizationContainer(windowId, bannerPos);
+        return new CreateCivilizationContainer(windowId, flagPattern);
     }
 
     @Override
