@@ -19,7 +19,7 @@ public class CivilizationData extends WorldSavedData {
     public static final String NAME = "civ_data";
 
     private final Map<UUID, Civilization> civilizationLookUp;
-    private final Map<UUID, Civilization> playerLookUp;
+    private final Map<UUID, Civilization> entityLookUp;
     private final Supplier<Scoreboard> scoreboardSupplier;
 
     public CivilizationData() {
@@ -29,8 +29,12 @@ public class CivilizationData extends WorldSavedData {
     public CivilizationData(Supplier<Scoreboard> scoreboardSupplier) {
         super(NAME);
         this.civilizationLookUp = Maps.newHashMap();
-        this.playerLookUp = Maps.newHashMap();
+        this.entityLookUp = Maps.newHashMap();
         this.scoreboardSupplier = scoreboardSupplier;
+    }
+
+    public Civilization getCivilization(UUID civilizationUniqueId) {
+        return civilizationLookUp.get(civilizationUniqueId);
     }
 
     public Civilization getCivilizationForEntity(Entity entity) {
@@ -38,7 +42,7 @@ public class CivilizationData extends WorldSavedData {
     }
 
     public Civilization getCivilizationForEntity(UUID uniqueId) {
-        return playerLookUp.get(uniqueId);
+        return entityLookUp.get(uniqueId);
     }
 
     public void createCivilization(Civilization civilization) {
@@ -55,7 +59,7 @@ public class CivilizationData extends WorldSavedData {
         if (!civilizationLookUp.containsKey(civilization.getUniqueId())) {
             this.createCivilization(civilization);
         }
-        playerLookUp.put(entityUniqueId, civilization);
+        entityLookUp.put(entityUniqueId, civilization);
     }
 
     public void removeEntityFromCivilization(Entity entity) {
@@ -63,7 +67,7 @@ public class CivilizationData extends WorldSavedData {
     }
 
     public void removeEntityFromCivilization(UUID entityUniqueId) {
-        playerLookUp.remove(entityUniqueId);
+        entityLookUp.remove(entityUniqueId);
     }
 
     @Override
@@ -73,6 +77,15 @@ public class CivilizationData extends WorldSavedData {
                 .mapToObj(civilizationData::getCompound)
                 .map(Civilization::load)
                 .forEach(civilization -> civilizationLookUp.put(civilization.getUniqueId(), civilization));
+        ListNBT entityData = nbt.getList("entities", 10);
+        IntStream.range(0, entityData.size())
+                .mapToObj(entityData::getCompound)
+                .forEach(compoundNBT ->
+                        entityLookUp.put(
+                                compoundNBT.getUniqueId("entity"),
+                                this.getCivilization(compoundNBT.getUniqueId("civilization"))
+                        )
+                );
     }
 
     @Override
@@ -83,11 +96,14 @@ public class CivilizationData extends WorldSavedData {
             civilizationData.add(civilization.serializeNBT());
         }
         compound.put("civilizations", civilizationData);
-        ListNBT playerData = new ListNBT();
-        for (Map.Entry<UUID, Civilization> entry : playerLookUp.entrySet()) {
-
+        ListNBT entityData = new ListNBT();
+        for (Map.Entry<UUID, Civilization> entry : entityLookUp.entrySet()) {
+            CompoundNBT playerCivilizationInfo = new CompoundNBT();
+            playerCivilizationInfo.putUniqueId("entity", entry.getKey());
+            playerCivilizationInfo.putUniqueId("civilization", entry.getValue().getUniqueId());
+            entityData.add(playerCivilizationInfo);
         }
-        compound.put("players", playerData);
+        compound.put("entities", entityData);
         return compound;
     }
 }
