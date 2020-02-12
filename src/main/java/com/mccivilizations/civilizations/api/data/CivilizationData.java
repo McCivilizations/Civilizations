@@ -52,22 +52,22 @@ public class CivilizationData extends WorldSavedData {
     }
 
     public void addEntityToCivilization(Entity entity, Civilization civilization) {
-        this.addEntityToCivilization(entity.getUniqueID(), civilization);
-    }
-
-    public void addEntityToCivilization(UUID entityUniqueId, Civilization civilization) {
         if (!civilizationLookUp.containsKey(civilization.getUniqueId())) {
             this.createCivilization(civilization);
         }
-        entityLookUp.put(entityUniqueId, civilization);
+        entityLookUp.put(entity.getUniqueID(), civilization);
+        Optional.ofNullable(this.scoreboardSupplier.get())
+                .ifPresent(scoreboard -> scoreboard.addPlayerToTeam(entity.getScoreboardName(),
+                        scoreboard.getTeam(civilization.getTeam())));
     }
 
     public void removeEntityFromCivilization(Entity entity) {
-        this.removeEntityFromCivilization(entity.getUniqueID());
-    }
-
-    public void removeEntityFromCivilization(UUID entityUniqueId) {
-        entityLookUp.remove(entityUniqueId);
+        Civilization civilization = entityLookUp.remove(entity.getUniqueID());
+        if (civilization != null) {
+            Optional.ofNullable(this.scoreboardSupplier.get())
+                    .ifPresent(scoreboard -> scoreboard.addPlayerToTeam(entity.getScoreboardName(),
+                            scoreboard.getTeam(civilization.getTeam())));
+        }
     }
 
     @Override
