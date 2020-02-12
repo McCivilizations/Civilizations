@@ -63,11 +63,19 @@ public class Civilization implements INBTSerializable<CompoundNBT> {
     }
 
     public void encode(PacketBuffer packetBuffer) {
-
+        packetBuffer.writeString(this.name);
+        packetBuffer.writeString(this.isoCode);
+        packetBuffer.writeString(this.team);
+        packetBuffer.writeUniqueId(this.uniqueId);
+        packetBuffer.writeCompoundTag(this.flag);
     }
 
     public void decode(PacketBuffer packetBuffer) {
-
+        this.name = packetBuffer.readString();
+        this.isoCode = packetBuffer.readString();
+        this.team = packetBuffer.readString();
+        this.uniqueId = packetBuffer.readUniqueId();
+        this.flag = packetBuffer.readCompoundTag();
     }
 
     @Override
